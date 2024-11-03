@@ -71,7 +71,7 @@ const viewArchive = () => {
                                         >
                                         <Link :href="route('post.create')">
                                             <SecondaryButton
-                                                class="text-[10px] text-white hover:bg-pink-500 bg-pink-600"
+                                                class="text-[10px] text-white hover:bg-pink-500 !bg-pink-600"
                                                 >Add New Post</SecondaryButton
                                             ></Link
                                         >

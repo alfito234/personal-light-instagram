@@ -3,7 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, router, useForm } from "@inertiajs/vue3";
 import ImageInput from "@/Components/ImageInput.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { ref, watch, onBeforeUnmount } from "vue";
@@ -18,9 +18,9 @@ const props = defineProps({
 const currentUser = ref(props.user);
 
 const form = useForm({
-    description: currentUser.value.profile.description,
-    url: currentUser.value.profile.url,
-    profile_picture: currentUser.value.profile.profile_picture,
+    description: props.user.profile.description,
+    url: props.user.profile.url,
+    profile_picture: props.user.profile.profile_picture,
 });
 
 const previewUrl = ref(null);
@@ -46,28 +46,10 @@ onBeforeUnmount(() => {
     }
 });
 
-const submit = () => {
-    const formData = new FormData();
-    formData.append("description", form.description);
-    formData.append("url", form.url);
-
-    // Tambahkan file `profile_picture` ke `FormData` jika tersedia
-    if (form.profile_picture instanceof File) {
-        formData.append("profile_picture", form.profile_picture);
-    }
-
-    form.patch(route("profile.update", { user: currentUser.value.id }), {
-        data: formData,
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-        onSuccess: () => {
-            console.log("Profile updated successfully!");
-        },
-        onError: (errors) => {
-            console.error("Failed to update profile:", errors);
-        },
-    });
+const submit = (id) => {
+    console.log(form.profile_picture);
+    // router.patch("/profile/" + id, form);
+    form.patch(route("profile.update", { user: currentUser.value.id }));
 };
 </script>
 
@@ -83,7 +65,7 @@ const submit = () => {
                     </h2>
                 </header>
                 <form
-                    @submit.prevent="submit"
+                    @submit.prevent="submit(props.user.id)"
                     class="grid items-center grid-cols-7 gap-10 mt-6"
                 >
                     <div class="col-span-2">

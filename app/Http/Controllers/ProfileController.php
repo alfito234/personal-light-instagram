@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -40,22 +41,15 @@ class ProfileController extends Controller
         $data = $request->validate([
             'description' => ['nullable', 'string'],
             'url' => ['nullable', 'url'],
-            'profile_picture' => ['image', 'max:10240']
+            'profile_picture' => ''
         ]);
 
         if ($request->hasFile('profile_picture')) {
-            // Simpan gambar
             $imagePath = $request->file('profile_picture')->store('profile', 'public');
+            $data['profile_picture'] = $imagePath;
         }
 
-        dd($data);
-
-        // Update profil dengan data baru
-        auth()->user()->profile->update(array_merge($data, [
-            'profile_picture' => $imagePath ? $imagePath : auth()->user()->profile->profile_picture, // Hanya update jika ada gambar
-        ]));
-
-
+        auth()->user()->profile->update($data);
 
         return redirect()->route('profile.show', $user->id)->with('success', 'Profile updated successfully!');
     }
