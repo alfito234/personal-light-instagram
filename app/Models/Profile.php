@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Profile extends Model
 {
-    protected $fillable = ['description', 'url', 'profile_picture', 'user_id'];
+    protected $fillable = ['description', 'url', 'profile_picture'];
 
     public function user()
     {

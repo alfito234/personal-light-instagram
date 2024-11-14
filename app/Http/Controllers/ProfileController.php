@@ -37,20 +37,25 @@ class ProfileController extends Controller
 
     public function update(Request $request, User $user)
     {
-
-        $data = $request->validate([
-            'description' => ['nullable', 'string'],
-            'url' => ['nullable', 'url'],
-            'profile_picture' => ''
+        $request->validate([
+            'description' => 'nullable|string',
+            'url' => 'nullable|url',
+            'profile_picture' => 'nullable|image'
         ]);
 
+        $profileData = $request->only('description', 'url');
+
         if ($request->hasFile('profile_picture')) {
-            $imagePath = $request->file('profile_picture')->store('profile', 'public');
-            $data['profile_picture'] = $imagePath;
+            if ($user->profile->profile_picture) {
+                Storage::disk('public')->delete($user->profile->profile_picture);
+            }
+
+            $path = $request->file('profile_picture')->store('profiles', 'public');
+            $profileData['profile_picture'] = $path;
         }
 
-        auth()->user()->profile->update($data);
+        $user->profile->update($profileData);
 
-        return redirect()->route('profile.show', $user->id)->with('success', 'Profile updated successfully!');
+        return redirect()->route('profile.show', $user->id)->with('success', 'Profile updated successfully.');
     }
 }

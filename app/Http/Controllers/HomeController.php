@@ -10,7 +10,7 @@ class HomeController extends Controller
 {
     public function show()
     {
-        $posts = Post::with('user')->latest()->get();
+        $posts = Post::with('user.profile')->latest()->get();
 
         return Inertia::render('Home', ['posts' => $posts]);
     }

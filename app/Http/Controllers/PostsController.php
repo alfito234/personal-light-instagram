@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PostsController extends Controller
@@ -13,18 +14,18 @@ class PostsController extends Controller
         return Inertia::render('Posts/Create');
     }
 
-    public function store()
+    public function store(Request $request)
     {
-        $data = request()->validate([
+        $validatedData = $request->validate([
             'caption' => ['required'],
             'image' => ['required', 'image', 'max:10240']
         ]);
 
-        $path = request('image')->store('uploads', 'public');
+        $imagePath = $request->file('image')->store('uploads', 'public');
 
         auth()->user()->posts()->create([
-            'caption' => $data['caption'],
-            'image' => $path
+            'caption' => $validatedData['caption'],
+            'image' => $imagePath
         ]);
 
         return redirect()->route('home')->with('success', 'Post created successfully!');
@@ -34,6 +35,5 @@ class PostsController extends Controller
     {
         $user = $post->user;
         return Inertia::render('Posts/DetailPost', ['user' => $user, 'post' => $post]);
-
     }
 }

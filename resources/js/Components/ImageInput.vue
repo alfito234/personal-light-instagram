@@ -35,7 +35,7 @@ const handleFileChange = (event) => {
                         :id="id"
                         class="sr-only"
                         type="file"
-                        accept="image/png, image/jpeg, image/gif"
+                        accept="image/*"
                         @change="handleFileChange"
                         v-bind="$attrs"
                     />

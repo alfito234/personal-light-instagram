@@ -35,7 +35,7 @@ const viewArchive = () => {
                             <div class="flex items-center justify-center">
                                 <img
                                     class="w-[180px] aspect-square object-cover rounded-full"
-                                    :src="`/storage/${user.profile.profile_picture}`"
+                                    :src="user.profile.profile_picture?('/storage/'+user.profile.profile_picture):'/storage/profiles/default.jpg'"
                                     alt="Profile Picture"
                                 />
                             </div>

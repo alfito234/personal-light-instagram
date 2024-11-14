@@ -22,9 +22,8 @@ Route::get('/home', [HomeController::class, 'show'])
 Route::get('/profile/{user_id}', [ProfileController::class, 'show'])->name('profile.show');
 
 Route::middleware('auth')->group(function () {
-
     Route::get('/profile/{user}/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update'); // Menambahkan POST untuk spoofing PATCH
 });
 
 Route::middleware('auth')->group(function () {

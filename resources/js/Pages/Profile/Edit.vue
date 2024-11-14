@@ -4,7 +4,6 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { Head, router, useForm } from "@inertiajs/vue3";
-import ImageInput from "@/Components/ImageInput.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { ref, watch, onBeforeUnmount } from "vue";
 
@@ -15,41 +14,24 @@ const props = defineProps({
     },
 });
 
-const currentUser = ref(props.user);
-
 const form = useForm({
     description: props.user.profile.description,
     url: props.user.profile.url,
-    profile_picture: props.user.profile.profile_picture,
+    profile_picture: null,
 });
 
-const previewUrl = ref(null);
+const previewImage = ref(props.user.profile.profile_picture);
 
-watch(
-    () => form.profile_picture,
-    (newFile) => {
-        if (newFile instanceof File) {
-            if (previewUrl.value) {
-                URL.revokeObjectURL(previewUrl.value);
-            }
-            previewUrl.value = URL.createObjectURL(newFile);
-        } else {
-            previewUrl.value = `/storage/${form.profile_picture}`;
-        }
-    },
-    { immediate: true }
-);
-
-onBeforeUnmount(() => {
-    if (previewUrl.value) {
-        URL.revokeObjectURL(previewUrl.value);
-    }
-});
+const handleFileChange = (e) => {
+    form.profile_picture = e.target.files[0];
+    previewImage.value = URL.createObjectURL(e.target.files[0]);
+};
 
 const submit = (id) => {
-    console.log(form.profile_picture);
-    // router.patch("/profile/" + id, form);
-    form.patch(route("profile.update", { user: currentUser.value.id }));
+    form.post(route("profile.update", { user: id }), {
+        _method: "patch",
+        forceFormData: true,
+    });
 };
 </script>
 
@@ -66,11 +48,12 @@ const submit = (id) => {
                 </header>
                 <form
                     @submit.prevent="submit(props.user.id)"
+                    enctype="multipart/form-data"
                     class="grid items-center grid-cols-7 gap-10 mt-6"
                 >
                     <div class="col-span-2">
                         <img
-                            :src="previewUrl"
+                            :src="previewImage"
                             alt="Profile Picture"
                             class="w-[180px] aspect-square object-cover rounded-full"
                         />
@@ -80,15 +63,17 @@ const submit = (id) => {
                             for="profile_picture"
                             value="Profile Picture"
                         />
-                        <ImageInput
+                        <input
+                            type="file"
                             id="profile_picture"
-                            v-model="form.profile_picture"
+                            accept="image/*"
+                            @input="handleFileChange"
                         />
+
                         <InputError
                             class="mt-2"
                             :message="form.errors.profile_picture"
                         />
-
                         <InputLabel for="description" value="Description" />
                         <TextInput
                             id="description"
